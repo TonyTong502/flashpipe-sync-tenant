@@ -1,0 +1,28 @@
+name: Tenant Snapshot
+on:
+  workflow_dispatch:
+    inputs:
+      draft:
+        description: '(Optional) Draft handling - SKIP (default value if empty), ADD, ERROR'
+        required: false
+      message:
+        description: '(Optional) Commit message'
+        required: false
+jobs:
+  take_snapshot:
+    runs-on: ubuntu-latest
+    container:
+      image: engswee/flashpipe:latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 'Take a snapshot'
+        uses: engswee/flashpipe-action/snapshot@v1
+        with:
+          tmn-host: ${{ vars.CPI_HOST }}
+          oauth-host: ${{ vars.TOKEN_HOST }}
+          oauth-clientid: ${{ secrets.DEV_CLIENT_ID }}
+          oauth-clientsecret: ${{ secrets.DEV_CLIENT_SECRET }}
+          draft-handling: ${{ github.event.inputs.draft }}
+          git-commit-msg: ${{ github.event.inputs.message }}
